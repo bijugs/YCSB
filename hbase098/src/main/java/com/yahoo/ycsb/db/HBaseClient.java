@@ -28,6 +28,9 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.HTableDescriptor;
 import org.apache.hadoop.hbase.KeyValue;
+import org.apache.hadoop.hbase.client.HConnectionManager;
+import org.apache.hadoop.hbase.client.HConnection;
+import org.apache.hadoop.hbase.client.HTableInterface;
 import org.apache.hadoop.hbase.client.Delete;
 import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.HTable;
@@ -60,7 +63,8 @@ public class HBaseClient extends com.yahoo.ycsb.DB
     public boolean _debug=false;
 
     public String _table="";
-    public HTable _hTable=null;
+    public HConnection _hConn=null;
+    public HTableInterface _hTable=null;
     public String _columnFamily="";
     public byte _columnFamilyBytes[];
     public boolean _clientSideBuffering = false;
@@ -102,11 +106,16 @@ public class HBaseClient extends com.yahoo.ycsb.DB
             try {
                 UserGroupInformation.loginUserFromKeytab(getProperties().getProperty("principal"), getProperties().getProperty("keytab"));
             } catch (IOException e) {
-                System.out.println("Keytab file is not readable or not found");
+                System.err.println("Keytab file is not readable or not found");
                 throw new DBException(e);
             }
         }
-
+        try {
+            _hConn = HConnectionManager.createConnection(config);
+        } catch (IOException e) {
+            System.err.println("Connection to HBase was not successful");
+            throw new DBException(e);  
+        }
         _columnFamily = getProperties().getProperty("columnfamily");
         if (_columnFamily == null)
         {
@@ -121,7 +130,7 @@ public class HBaseClient extends com.yahoo.ycsb.DB
       String table = com.yahoo.ycsb.workloads.CoreWorkload.table;
       try
 	  {
-	      HTable ht = new HTable(config, table);
+	      HTableInterface ht = _hConn.getTable(table);
 	      ht.getTableDescriptor();
 	  }
       catch (IOException e)
@@ -154,7 +163,7 @@ public class HBaseClient extends com.yahoo.ycsb.DB
     public void getHTable(String table) throws IOException
     {
         synchronized (tableLock) {
-            _hTable = new HTable(config, table);
+            _hTable = _hConn.getTable(table);
             //2 suggestions from http://ryantwopointoh.blogspot.com/2009/01/performance-of-hbase-importing.html
             _hTable.setAutoFlush(!_clientSideBuffering, true);
             _hTable.setWriteBufferSize(_writeBufferSize);

@@ -153,6 +153,9 @@ public class HBaseClient extends com.yahoo.ycsb.DB
             if (_hTable != null) {
                 _hTable.flushCommits();
             }
+            if (_hConn != null) {
+                _hConn.close();
+            }
             long en=System.nanoTime();
             _measurements.measure("UPDATE", (int)((en-st)/1000));
         } catch (IOException e) {

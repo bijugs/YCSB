@@ -67,7 +67,7 @@ public class HBaseClient10 extends com.yahoo.ycsb.DB {
   private boolean debug = false;
 
   private String tableName = "";
-  private Connection connection = null;
+  private static Connection connection = null;
 
   // Depending on the value of clientSideBuffering, either bufferedMutator
   // (clientSideBuffering) or currentTable (!clientSideBuffering) will be used.

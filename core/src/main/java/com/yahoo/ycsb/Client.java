@@ -364,14 +364,14 @@ class ClientThread extends Thread
     try
     {
       _measurements.setIntendedStartTimeNs(0);
-      _db.cleanup();
+      //_db.cleanup();
     }
-    catch (DBException e)
-    {
-      e.printStackTrace();
-      e.printStackTrace(System.out);
-      return;
-    }
+    //catch (DBException e)
+    //{
+      //e.printStackTrace();
+      //e.printStackTrace(System.out);
+      //return;
+    //}
     finally
     {
       _completeLatch.countDown();
@@ -913,6 +913,16 @@ public class Client
       }
     }
 
+    for (ClientThread t : clients)
+    {
+      try 
+      {
+        t._db.cleanup();
+      }
+      catch (DBException e)
+      {
+      }
+    }
     long en=System.currentTimeMillis();
 
     if (terminator != null && !terminator.isInterrupted()) {

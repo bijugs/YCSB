@@ -100,6 +100,7 @@ public class HBaseClient extends com.yahoo.ycsb.DB
           _usePageFilter = false;
         }
         if ("kerberos".equalsIgnoreCase(config.get("hbase.security.authentication"))) {
+          config.set("hadoop.security.authentication", "Kerberos");
           UserGroupInformation.setConfiguration(config);
         }
         if ( (getProperties().getProperty("principal")!=null) && (getProperties().getProperty("keytab")!=null) ){

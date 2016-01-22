@@ -114,6 +114,7 @@ public class HBaseClient10 extends com.yahoo.ycsb.DB {
     }
 
     if ("kerberos".equalsIgnoreCase(config.get("hbase.security.authentication"))) {
+      config.set("hadoop.security.authentication", "Kerberos");
       UserGroupInformation.setConfiguration(config);
     }
 

@@ -63,7 +63,7 @@ public class HBaseClient extends com.yahoo.ycsb.DB
     public boolean _debug=false;
 
     public String _table="";
-    public HConnection _hConn=null;
+    public static HConnection _hConn=null;
     public HTableInterface _hTable=null;
     public String _columnFamily="";
     public byte _columnFamilyBytes[];
